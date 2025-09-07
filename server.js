@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 const Koa = require('koa');
 const Router = require('koa-router');
 const bodyParser = require('koa-bodyparser');
@@ -5,10 +7,13 @@ const bodyParser = require('koa-bodyparser');
 const app = new Koa();
 const router = new Router({ prefix: '/api/v1' });
 
+// parameters: longUrl
+// returns: { shortUrl }
 router.post('/data/shorten', async ctx => {
   ctx.body = { message: 'Shorten endpoint hit' };
 });
 
+// redirects to longUrl
 router.get('/shortUrl', async ctx => {
   ctx.body = { message: 'ShortUrl endpoint hit' };
 });
