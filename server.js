@@ -5,11 +5,11 @@ const Router = require('koa-router');
 const bodyParser = require('koa-bodyparser');
 
 const app = new Koa();
-const router = new Router({ prefix: '/api/v1' });
+const router = new Router();
 
 // parameters: longUrl
 // returns: { shortUrl }
-router.post('/data/shorten', async ctx => {
+router.post('/api/shorten', async ctx => {
   ctx.body = { message: 'Shorten endpoint hit' };
 });
 
@@ -18,13 +18,13 @@ router.get('/shortUrl', async ctx => {
   ctx.body = { message: 'ShortUrl endpoint hit' };
 });
 
+router.get('/api/health', async ctx => {
+  ctx.body = { status: 'ok' };
+});
+
 app.use(bodyParser());
 app.use(router.routes());
 app.use(router.allowedMethods());
-
-app.use(async ctx => {
-  ctx.body = { status: 'ok' };
-});
 
 const port = process.env.PORT || 3000;
 app.listen(port);
