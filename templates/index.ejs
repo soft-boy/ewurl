@@ -31,7 +31,7 @@
                 });
 
                 const data = await res.json();
-                document.getElementById("shortenedUrl").innerHTML = data.shortUrl;
+                document.getElementById("shortenedUrl").innerHTML = "https://ewurl.cc/"+data.shortUrl;
                 document.getElementById("result").style.display = "block";
             });
         </script>

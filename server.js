@@ -11,6 +11,9 @@ const router = new Router();
 const render = views(__dirname+'/templates', { extension: 'ejs' })
 const pg = new Client({ ssl: { rejectUnauthorized: false } });
 
+const snowflake = require('./lib/snowflake_id');
+const base62 = require('./lib/base62');
+
 pg.connect()
 
 // serves the homepage
@@ -23,8 +26,28 @@ router.get('/', async ctx => {
 // returns: { shortUrl }
 router.post('/api/shorten', async ctx => {
   const longUrl = ctx.request.body.longUrl;
-  
-  ctx.body = { shortUrl: longUrl };
+
+  try {
+    const res = await pg.query('SELECT shortUrl FROM urls WHERE longUrl = $1::text', [longUrl]);
+    if (res.rows.length > 0) {
+      // longUrl exists
+      ctx.body = { shortUrl: res.rows[0].shorturl };
+    } else {
+      // longUrl does not exist
+      const id = snowflake.get_unique_id();
+      const shortUrl = base62.encode(id);
+
+      await pg.query(
+        'INSERT INTO urls (id, shortUrl, longUrl) VALUES ($1, $2, $3)',
+        [id, shortUrl, longUrl]
+      );
+
+      ctx.body = { shortUrl };
+    }
+  } catch (err) {
+    ctx.status = 500;
+    ctx.body = { error: 'Internal Server Error' };
+  }
 });
 
 // redirects to longUrl
