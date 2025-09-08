@@ -3,17 +3,20 @@ require('dotenv').config();
 const Koa = require('koa');
 const Router = require('@koa/router');
 const { bodyParser } = require("@koa/bodyparser");
+const views = require('@ladjs/koa-views');
 const { Client } = require('pg');
 
 const app = new Koa();
 const router = new Router();
-const pg = new Client({
-  ssl: {
-    rejectUnauthorized: false
-  }
-});
+const render = views(__dirname+'/templates', { extension: 'ejs' })
+const pg = new Client({ ssl: { rejectUnauthorized: false } });
 
 pg.connect()
+
+// serves the homepage
+router.get('/', async ctx => {
+  return await ctx.render('index', { message: 'Hello World' });
+});
 
 // parameters: longUrl
 // returns: { shortUrl }
@@ -47,6 +50,7 @@ router.get('/api/health', async ctx => {
   ctx.body = { status: 'ok' };
 });
 
+app.use(render);
 app.use(bodyParser());
 app.use(router.routes());
 app.use(router.allowedMethods());
