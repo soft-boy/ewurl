@@ -6,6 +6,34 @@
         <title>EW Url | Url Shortening by Eric Wang</title>
     </head>
     <body>
-        <div><%= message %></div>
+        <h2>EW Url</h2>
+        <div>It's like TinyURL, but made by Eric Wang.</div>
+        <br />
+        <form id="shorten-form">
+            <input type="text" id="longUrl" placeholder="https://en.wikipedia.org/wiki/URL_shortening" style="width: 300px;" />
+            <button id="submit">Submit</button>
+        </form>
+        <br />
+        <div id="result" style="display: none;">
+            <div>Your shortened Url:</div>
+            <div id="shortenedUrl"></div>
+        </div>
+
+        <script>
+            document.getElementById("shorten-form").addEventListener("submit", async (e) => {
+                e.preventDefault();
+                const longUrl = document.getElementById("longUrl").value;
+
+                const res = await fetch("/api/shorten", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ longUrl })
+                });
+
+                const data = await res.json();
+                document.getElementById("shortenedUrl").innerHTML = data.shortUrl;
+                document.getElementById("result").style.display = "block";
+            });
+        </script>
     </body>
 </html>

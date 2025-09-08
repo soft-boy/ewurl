@@ -15,13 +15,16 @@ pg.connect()
 
 // serves the homepage
 router.get('/', async ctx => {
-  return await ctx.render('index', { message: 'Hello World' });
+  // todo: pass in recent URLs
+  return await ctx.render('index');
 });
 
 // parameters: longUrl
 // returns: { shortUrl }
 router.post('/api/shorten', async ctx => {
-  ctx.body = { message: 'Shorten endpoint hit' };
+  const longUrl = ctx.request.body.longUrl;
+  
+  ctx.body = { shortUrl: longUrl };
 });
 
 // redirects to longUrl
