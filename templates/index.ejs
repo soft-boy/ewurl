@@ -4,21 +4,55 @@
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <title>EW Url | Url Shortening by Eric Wang</title>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/daisyui@4.10.2/dist/full.css" />
+        <link rel="stylesheet" href="/output.css" />
     </head>
-    <body>
-        <h2>EW Url</h2>
-        <div>It's like TinyURL, but made by Eric Wang.</div>
-        <br />
-        <form id="shorten-form">
-            <input type="text" id="longUrl" placeholder="https://en.wikipedia.org/wiki/URL_shortening" style="width: 300px;" />
-            <button id="submit">Submit</button>
-        </form>
-        <br />
-        <div id="result" style="display: none;">
-            <div>Your shortened Url:</div>
-            <div id="shortenedUrl"></div>
+    <body class="bg-base-200 min-h-screen flex items-center justify-center">
+        <div class="card w-full max-w-3xl shadow-xl bg-base-100 p-8">
+            <div class="flex flex-row gap-8 items-center justify-center">
+                <div>
+                    <div class="text-4xl font-bold text-primary mb-2 text-center">EW Url</div>
+                    <div class="text-center mb-6">It's like TinyURL, but made by Eric Wang.</div>
+                    <form id="shorten-form" class="flex flex-col gap-4">
+                        <input type="text" id="longUrl" class="input input-bordered w-full" placeholder="https://en.wikipedia.org/wiki/URL_shortening" />
+                        <button id="submit" class="btn btn-primary w-full">Submit</button>
+                    </form>
+                    <div id="result" style="display: none;" class="alert alert-success mt-6 flex-col items-center">
+                        <span>Your shortened Url:</span>
+                        <div class="flex items-center justify-center gap-2">
+                            <span id="shortenedUrl" class="font-mono text-lg"></span>
+                            <button id="copyBtn" type="button" class="btn btn-primary btn-sm" title="Copy to clipboard">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16h8a2 2 0 002-2V8a2 2 0 00-2-2H8a2 2 0 00-2 2v6a2 2 0 002 2zm0 0v2a2 2 0 002 2h4a2 2 0 002-2v-2"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <!-- Vertical Divider -->
+                <div class="divider divider-horizontal h-32"></div>
+                <!-- Right: Recently Generated Links Table -->
+                <div class="w-64">
+                    <div class="font-bold text-lg mb-2 text-center">Recently Generated Links</div>
+                    <table class="table table-sm w-full">
+                        <tbody>
+                            <% if (recentShortUrls && recentShortUrls.length > 0) { %>
+                                <% recentShortUrls.forEach(function(url, idx) { %>
+                                    <tr>
+                                        <td class="text-right w-4 pr-2 font-bold"><%= idx + 1 %>.</td>
+                                        <td>
+                                            <a href="/<%= url %>" class="link" target="_blank">https://ewurl.cc/<%= url %></a>
+                                        </td>
+                                    </tr>
+                                <% }); %>
+                            <% } else { %>
+                                <tr><td colspan="2">No recent links.</td></tr>
+                            <% } %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
-
         <script>
             document.getElementById("shorten-form").addEventListener("submit", async (e) => {
                 e.preventDefault();
@@ -31,8 +65,15 @@
                 });
 
                 const data = await res.json();
-                document.getElementById("shortenedUrl").innerHTML = "https://ewurl.cc/"+data.shortUrl;
+                document.getElementById("shortenedUrl").innerHTML = "https://ewurl.cc/" + data.shortUrl;
                 document.getElementById("result").style.display = "block";
+            });
+
+            document.getElementById("copyBtn").addEventListener("click", () => {
+                const url = document.getElementById("shortenedUrl").textContent;
+                if (url) {
+                    navigator.clipboard.writeText(url);
+                }
             });
         </script>
     </body>

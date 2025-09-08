@@ -4,6 +4,7 @@ const Koa = require('koa');
 const Router = require('@koa/router');
 const { bodyParser } = require("@koa/bodyparser");
 const views = require('@ladjs/koa-views');
+const serve = require('koa-static');
 const { Client } = require('pg');
 
 const app = new Koa();
@@ -18,8 +19,12 @@ pg.connect()
 
 // serves the homepage
 router.get('/', async ctx => {
-  // todo: pass in recent URLs
-  return await ctx.render('index');
+  const res = await pg.query(
+    'SELECT shortUrl FROM urls ORDER BY id DESC LIMIT 6'
+  );
+  const recentShortUrls = res.rows.map(row => row.shorturl);
+
+  return await ctx.render('index', { recentShortUrls });
 });
 
 // parameters: longUrl
@@ -77,6 +82,7 @@ router.get('/api/health', async ctx => {
 });
 
 app.use(render);
+app.use(serve('public'));
 app.use(bodyParser());
 app.use(router.routes());
 app.use(router.allowedMethods());
